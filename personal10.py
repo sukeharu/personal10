@@ -3,7 +3,6 @@
 
 import argparse
 from io import BytesIO
-# from pathlib import Path
 from PIL import Image
 import pytesseract # https://pypi.org/project/pytesseract/
 import regex as re
