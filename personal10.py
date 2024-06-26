@@ -24,7 +24,12 @@ def get_image_url() -> str:
 
     # 画像のパスを取得
     soup = BeautifulSoup(res.text, 'html.parser')
-    return urljoin(url, soup.find(alt='個人向け国債の金利')['src'])
+    picture_children = soup.find(class_="home-rate-description").picture
+    for child in picture_children:
+        if child.name == 'source' and child['media'] == '(min-width:768px)':
+            imgurl = child['srcset']
+
+    return urljoin(url, imgurl)
 
 
 def scan_image(url: str, test=''):
@@ -73,13 +78,14 @@ def main(args):
         text = scan_image('./rate-051.jpg', test=localpath)
     else:
         text = scan_image(get_image_url())
+        # print(text)
 
     if re.search(r'現在募集は行っておりません', text):
         # 募集中かどうかをチェック
         print('個人向け国債10年もの : 現在募集していない')
     else:
         # 募集中の場合利率を表示
-        if (result := re.search(r'^(\d+\.\d+)%', text, flags=re.MULTILINE)):
+        if (result := re.search(r'^(\d+\.\d+)', text, flags=re.MULTILINE)):
             print(f'個人向け国債10年もの : 募集中 初回利率{result.group(1)}%')
 
 
