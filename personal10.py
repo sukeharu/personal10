@@ -24,12 +24,14 @@ def get_image_url() -> str:
 
     # 画像のパスを取得
     soup = BeautifulSoup(res.text, 'html.parser')
-    picture_children = soup.find(class_="home-rate-description").picture
-    for child in picture_children:
-        if child.name == 'source' and child['media'] == '(min-width:768px)':
-            imgurl = child['srcset']
-
-    return urljoin(url, imgurl)
+    picture = soup.find(class_="home-rate-img").picture
+    try:
+        picture_children = picture.children
+        for child in picture_children:
+            if child.name == 'source' and child['media'] == '(min-width: 768px)':
+                return urljoin(url, child['srcset'])
+    except AttributeError as e:
+        print("Error: 要素が見つかりません。", e)
 
 
 def scan_image(url: str, test=''):
